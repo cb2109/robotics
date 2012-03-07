@@ -1,13 +1,13 @@
 package navigation;
 
+import navigation.Pose;
+
 import lejos.geom.Point;
-import lejos.robotics.navigation.Pose;
 
 import java.lang.Math;
 
 public class Wall {
 
-	private static final float ERROR = 0.001f;
 	private Point a;
 	private Point b;
 	
@@ -29,8 +29,8 @@ public class Wall {
 	 * @param p the pose of the object
 	 * @return the distance to the wall.
 	 */
-	public float distanceToWall(Pose p) {
-		return distanceToWall(p.getX(), p.getY(), p.getHeading());
+	public double distanceToWall(Pose p) {
+		return distanceToWall(p.getX(), p.getY(), p.getAngle());
 	}
 	
 	/**
@@ -44,29 +44,29 @@ public class Wall {
 	 * @param angle angle of the input line, given from the x axis.
 	 * @return the distance to the wall. Returns max double if the wall and line do not intersect.
 	 */
-	public float distanceToWall(float x, float y, float angle) {
+	public double distanceToWall(double x, double y, double angle) {
 		
-		float yDiff = (float) (b.getY() - a.getY());
-		float xDiff = (float) (b.getX() - a.getX());
+		double yDiff = b.getY() - a.getY();
+		double xDiff = b.getX() - a.getX();
 		
-		float div = (float) ((yDiff * Math.cos(angle)) - xDiff * Math.sin(angle));
+		double div = (yDiff * Math.cos(angle)) - xDiff * Math.sin(angle);
 		
-		if (div < ERROR) {
-			return Float.MAX_VALUE;
+		if (div == 0) {
+			return Double.MAX_VALUE;
 		}
 		
-		float top = yDiff * ((float)(a.getX()) - x) - xDiff * ((float)(a.getY()) - y);
+		double top = yDiff * (a.getX() - x) - xDiff * (a.getY() - y);
 		
 		return top / div;
 		
 	}
 	
 	public boolean willCollide(Pose p) {
-		return willCollide(p.getX(), p.getY(), p.getHeading());
+		return willCollide(p.getX(), p.getY(), p.getAngle());
 	}
 	
 	
-	public boolean willCollide(float x, float y, float angle) {
+	public boolean willCollide(double x, double y, double angle) {
 		double dist = distanceToWall(x, y, angle);
 		Point intersect = movePoint(x, y, angle, dist);
 		
